@@ -1,0 +1,10 @@
+[daemon]
+data_dir = /tmp
+pid_file = /tmp/mqtt2rrd.pid
+
+[logging]
+log_file = /tmp/mqtt2rrd.log
+
+[mqtt]
+hostname = test.mosquitto.org
+port= 1883
