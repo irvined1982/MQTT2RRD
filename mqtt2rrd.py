@@ -282,8 +282,9 @@ class Daemon:
             logger.error(message % self.pidfile)
             sys.exit(1)
         # Start the daemon
+        logger.debug("Daemonizing")
         self.daemonize()
-
+        logger.debug("Running")
         self.run(*args, **kwargs)
 
     def stop(self):
