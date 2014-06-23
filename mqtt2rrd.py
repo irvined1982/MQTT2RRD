@@ -68,19 +68,6 @@ def start(args, daemon):
         sys.stderr.write(
             "%s: Error: data directory %s does not exist or is not a directory\n" % (sys.argv[0], data_dir))
         sys.exit(1)
-    formatter = logging.Formatter('%(asctime)s: %(levelname)s: %(message)s')
-
-    logger.setLevel(int(get_config_item("logging", "log_level", "10")))
-    lf=get_config_item("logging", "log_file", None)
-    if lf:
-        fh = logging.FileHandler(lf)
-        fh.setLevel(int(get_config_item("logging", "log_level", "10")))
-        fh.setFormatter(formatter)
-        logger.addHandler(fh)
-    ch = logging.StreamHandler()
-    ch.setLevel(int(get_config_item("logging", "log_level", "10")))
-    ch.setFormatter(formatter)
-    logger.addHandler(ch)
 
     if args.no_daemon:
         run(args)
@@ -123,7 +110,7 @@ def run(args):
         except Exception as e:
             logging.critical("FAIL: %s" % str(e))
             time.sleep(30) # 30 second wait
-        
+
 
 ####
 #
@@ -373,6 +360,22 @@ if len(args.config_file) > 0:
     config.read(args.config_file)
 else:
     config.read(['/etc/mqtt2rrd.conf', os.path.expanduser('~/.mqtt2rrd.conf')])
+
+formatter = logging.Formatter('%(asctime)s: %(levelname)s: %(message)s')
+
+logger.setLevel(int(get_config_item("logging", "log_level", "10")))
+lf=get_config_item("logging", "log_file", None)
+if lf:
+    fh = logging.FileHandler(lf)
+    fh.setLevel(int(get_config_item("logging", "log_level", "10")))
+    fh.setFormatter(formatter)
+    logger.addHandler(fh)
+ch = logging.StreamHandler()
+ch.setLevel(int(get_config_item("logging", "log_level", "10")))
+ch.setFormatter(formatter)
+logger.addHandler(ch)
+
+
 
 # Change to correct user if running as root.
 user = get_config_item("daemon", "user", None)
