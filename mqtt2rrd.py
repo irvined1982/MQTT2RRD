@@ -89,7 +89,8 @@ def start(args, daemon):
                 run(args)
             else:
                 daemon.start(args)
-        except:
+        except Exception as e:
+            logging.critical("FAIL: %s" % str(e))
             time.sleep(30) # 30 second wait
 
 def stop(args, daemon):
