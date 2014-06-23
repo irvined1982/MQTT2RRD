@@ -82,12 +82,15 @@ def start(args, daemon):
     ch.setFormatter(formatter)
     logger.addHandler(ch)
 
-    # Get Busy
-    if args.no_daemon:
-        run(args)
-    else:
-        daemon.start(args)
-
+    while(True):
+        try:
+                # Get Busy
+            if args.no_daemon:
+                run(args)
+            else:
+                daemon.start(args)
+        except:
+            time.sleep(30) # 30 second wait
 
 def stop(args, daemon):
     daemon.stop()
@@ -114,9 +117,9 @@ def run(args):
         )
     logger.debug("Attempting to connect to server: %s:%s" % (get_config_item("mqtt", "hostname", "localhost"), get_config_item("mqtt", "port", 1833),))
     client.connect(
-        host=get_config_item("mqtt", "hostname", "localhost"),
-        port=get_config_item("mqtt", "port", 1883),
-        keepalive=get_config_item("mqtt", "keepalive", 60),
+        get_config_item("mqtt", "hostname", "localhost"),
+        port=int(get_config_item("mqtt", "port", 1883)),
+        keepalive=int(get_config_item("mqtt", "keepalive", 60)),
     )
     logger.info("Connected: %s:%s" % (get_config_item("mqtt", "hostname", "localhost"), get_config_item("mqtt", "port", 1833),))
     client.loop_forever()
@@ -127,11 +130,11 @@ def run(args):
 # MQTT Callback handlers
 #
 ####
-
 def on_connect(client, userdata, rc):
     logger.info("Connected to server.")
     subs = get_config_item("mqtt", "subscriptions", "#")
     for i in subs.split(","):
+        logger.info("Subscribing to topic: %s" % i)
         client.subscribe(i)
 
 
@@ -143,7 +146,7 @@ def on_message(mosq, obj, msg):
         logger.debug("Unable to get float from payload: %s" % msg.payload)
         return
 
-    logger.info("Logging message message received on topic " + msg.topic + " with QoS " + str(
+    logger.info("Message received on topic " + msg.topic + " with QoS " + str(
         msg.qos) + " and payload %d " % pl)
     components = msg.topic.split("/")
     file_name = components.pop()

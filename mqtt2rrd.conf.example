@@ -1,10 +1,26 @@
 [daemon]
 data_dir = /tmp
 pid_file = /tmp/mqtt2rrd.pid
+user = mqtt
+group = mqtt
 
 [logging]
 log_file = /tmp/mqtt2rrd.log
+log_level = 20
+
 
 [mqtt]
+client_id = "MQTT_to_RRD_TEST"
 hostname = test.mosquitto.org
 port= 1883
+#username="bob"
+#password="t0ps3cr3t!"
+keepalive=60
+subscriptions=#
+
+[/other/important/topic]
+friendly_name = "My Important Topic"
+step=30 
+archives=RRA:AVERAGE:0.5:1:120,RRA:AVERAGE:0.5:5:288
+
+
