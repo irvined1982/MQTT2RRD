@@ -382,6 +382,7 @@ logger.addHandler(ch)
 # Change to correct user if running as root.
 user = get_config_item("daemon", "user", None)
 group = get_config_item("daemon", "group", None)
+print group, user
 if user and group and os.getuid() == 0:
     user = pwd.getpwnam(user).pw_uid
     group = grp.getgrnam(group).gr_gid
