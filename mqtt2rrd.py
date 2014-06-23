@@ -88,7 +88,7 @@ def run(args):
     Is called by either the daemon.start() method, or the start function
     if the no-daemon option is specified.
     """
-     while(True):
+    while(True):
         try:
             client = mosquitto.Mosquitto(get_config_item("mqtt", "client_id", "MQTT2RRD Client"))
             client.on_message = on_message
