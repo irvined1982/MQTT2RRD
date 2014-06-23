@@ -82,16 +82,10 @@ def start(args, daemon):
     ch.setFormatter(formatter)
     logger.addHandler(ch)
 
-    while(True):
-        try:
-                # Get Busy
-            if args.no_daemon:
-                run(args)
-            else:
-                daemon.start(args)
-        except Exception as e:
-            logging.critical("FAIL: %s" % str(e))
-            time.sleep(30) # 30 second wait
+    if args.no_daemon:
+        run(args)
+    else:
+        daemon.start(args)
 
 def stop(args, daemon):
     daemon.stop()
@@ -107,24 +101,29 @@ def run(args):
     Is called by either the daemon.start() method, or the start function
     if the no-daemon option is specified.
     """
-    client = mosquitto.Mosquitto(get_config_item("mqtt", "client_id", "MQTT2RRD Client"))
-    client.on_message = on_message
-    client.on_connect = on_connect
+     while(True):
+        try:
+            client = mosquitto.Mosquitto(get_config_item("mqtt", "client_id", "MQTT2RRD Client"))
+            client.on_message = on_message
+            client.on_connect = on_connect
 
-    if get_config_item("mqtt", "username", None):
-        client.username_pw_set(
-            get_config_item("mqtt", "username", ""),
-            get_config_item("mqtt", "password", ""),
-        )
-    logger.debug("Attempting to connect to server: %s:%s" % (get_config_item("mqtt", "hostname", "localhost"), get_config_item("mqtt", "port", 1833),))
-    client.connect(
-        get_config_item("mqtt", "hostname", "localhost"),
-        port=int(get_config_item("mqtt", "port", 1883)),
-        keepalive=int(get_config_item("mqtt", "keepalive", 60)),
-    )
-    logger.info("Connected: %s:%s" % (get_config_item("mqtt", "hostname", "localhost"), get_config_item("mqtt", "port", 1833),))
-    client.loop_forever()
-
+            if get_config_item("mqtt", "username", None):
+                client.username_pw_set(
+                    get_config_item("mqtt", "username", ""),
+                    get_config_item("mqtt", "password", ""),
+                )
+            logger.debug("Attempting to connect to server: %s:%s" % (get_config_item("mqtt", "hostname", "localhost"), get_config_item("mqtt", "port", 1833),))
+            client.connect(
+                get_config_item("mqtt", "hostname", "localhost"),
+                port=int(get_config_item("mqtt", "port", 1883)),
+                keepalive=int(get_config_item("mqtt", "keepalive", 60)),
+            )
+            logger.info("Connected: %s:%s" % (get_config_item("mqtt", "hostname", "localhost"), get_config_item("mqtt", "port", 1833),))
+            client.loop_forever()
+        except Exception as e:
+            logging.critical("FAIL: %s" % str(e))
+            time.sleep(30) # 30 second wait
+        
 
 ####
 #
