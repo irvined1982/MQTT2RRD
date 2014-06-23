@@ -65,7 +65,7 @@ def start(args, daemon):
     # Check the data directory exists
     data_dir = get_config_item("daemon", "data_dir", "/var/lib/mqtt2rrd", )
     if not os.path.isdir(data_dir):
-        sys.stderr.write(
+        logger.critical(
             "%s: Error: data directory %s does not exist or is not a directory\n" % (sys.argv[0], data_dir))
         sys.exit(1)
 
@@ -90,6 +90,7 @@ def run(args):
     """
     while(True):
         try:
+            logger.debug("Entering Loop")
             client = mosquitto.Mosquitto(get_config_item("mqtt", "client_id", "MQTT2RRD Client"))
             client.on_message = on_message
             client.on_connect = on_connect
@@ -278,7 +279,7 @@ class Daemon:
 
         if pid:
             message = "pidfile %s already exist. Daemon already running?\n"
-            sys.stderr.write(message % self.pidfile)
+            logger.error(message % self.pidfile)
             sys.exit(1)
         # Start the daemon
         self.daemonize()
@@ -299,7 +300,7 @@ class Daemon:
 
         if not pid:
             message = "pidfile %s does not exist. Daemon not running?\n"
-            sys.stderr.write(message % self.pidfile)
+            logger.info(message % self.pidfile)
             return  # not an error in a restart
 
         # Try killing the daemon process
@@ -391,5 +392,5 @@ if user and group and os.getuid() == 0:
 logger.info("Running as: %s" % getpass.getuser())
 
 daemon = MQTTDaemon(get_config_item("daemon","pid_file","/var/run/mqtt2rrd.pid"))
-
+logger.debug("Setup Daemon")
 args.func(args, daemon)
