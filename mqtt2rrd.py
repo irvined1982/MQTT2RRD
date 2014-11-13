@@ -190,7 +190,7 @@ def on_message(mosq, obj, msg):
             logger.error("Could not create RRD for topic: %s: %s" % (ds, str(e)))
     try:
         logger.info("Updating: %s with value: %s" % (file_path, pl))
-        rrdtool.update(str(file_path), str("N:%d" % pl))
+        rrdtool.update(str(file_path), str("N:%f" % pl))
     except rrdtool.error as e:
         logger.error("Could not log value: %s to RRD %s for topic: %s: %s" % (pl, file_path, msg.topic, str(e)))
 
